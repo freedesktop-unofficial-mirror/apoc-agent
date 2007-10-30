@@ -1,0 +1,65 @@
+#!/bin/bash
+#
+# Copyright (c) 2004 by Sun Microsystems, Inc.
+# All rights reserved.
+#
+# /etc/init.d/apocd
+#
+### BEGIN INIT INFO
+# Provides: apocd
+# Required-Start: $network $local_fs
+# Required-Stop: $network $local_fs
+# Default-Start: 3 5
+# Default-Stop: 0 1 2 6
+# Description: Configuration Agent
+### END INIT INFO
+
+APOCD_BIN=@APOCD_DIR@/apocd
+test -x $APOCD_BIN || exit 5
+
+. /etc/rc.status
+rc_reset
+
+case "$1" in
+    start)
+		echo -n "Starting Configuration Agent"
+		$APOCD_BIN svcStart > /dev/null
+		rc_status -v
+		;;
+
+    stop)
+		echo -n "Stopping Configuration Agent"
+		$APOCD_BIN svcStop > /dev/null
+		rc_status -v
+		;;
+
+    try-restart)
+        $0 status >/dev/null &&  $0 restart
+        rc_status
+        ;;
+
+    restart)
+        $0 stop
+		$0 start
+        rc_status
+        ;;
+
+    force-reload|reload)
+		echo -n "Reloading Configuration Agent"
+		$APOCD_BIN reload > /dev/null
+        rc_status -v
+        ;;
+
+    status)
+		echo -n "Checking Configuration Agent status"
+		$APOCD_BIN status > /dev/null
+		rc_status -v
+		;;
+
+    *)
+		echo "Usage: $0 {start|stop|status|try-restart|restart|force-reload|reload}"
+		exit 1
+		;;
+esac
+rc_exit
+

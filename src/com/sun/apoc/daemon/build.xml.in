@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+#*************************************************************************
+#*
+#*    $RCSfile: build.xml,v $
+#*
+#*    Creation date     cas  12 February, 2002
+#*    last change       $Author: cm122549 $ $Date: 2006/11/27 15:42:26 $
+#*    $Revision: 1.4 $
+#*
+#*    Copyright 2003, Sun Microsystems, Inc. All Rights Reserved.
+#*
+#*************************************************************************
+-->
+<project name="ap_policy" default="main" basedir="../../../../../">
+    
+    <property name="jarname" value="apocd.jar"/>
+    <property name="package" value="com/sun/apoc/daemon"/>
+    <property name="build.dir" value="build"/>
+    <property name="build.class" value="build/class"/>
+    <property name="build.inc" value="build/inc"/>
+
+	<target name="info">
+	    <echo message="-------------------------------"/>
+	    <echo message="|        APOC Daemon          |"/>
+	    <echo message="-------------------------------"/>
+	</target>
+	
+	<path id="classpath">
+		<pathelement location="@SPIJDK@"/>
+		<pathelement location="@BDBJDK@"/>
+	</path>
+
+    <target name="prepare">
+        <mkdir dir="${build.dir}"/>
+        <mkdir dir="${build.class}"/>
+    </target>
+
+    <target name="compile" depends="prepare">
+    	<javac srcdir="src"
+    	        destdir="${build.class}"
+				optimize="${optimize}"
+				debug="${debug}"
+    	        classpathref="classpath">
+    	    <include name="${package}/**/*.java"/>
+    	</javac> 
+    </target>
+
+    <target name="jar" depends="compile">
+	<condition property="dataDir" value="@APOC_DATADIR@">
+		<os name="SunOS"/>
+	</condition>
+        <condition property="dataDir" value="@APOC_DATADIR@">
+            <os name="Linux"/>
+        </condition>
+	<condition property="dataDir" value="\\Documents and Settings\\All Users\\Application Data\\apoc">
+		<os family="Windows"/>
+	</condition>
+
+	<copy file="src/${package}/properties/defaults.properties"
+		  tofile="${build.class}/${package}/defaults.properties"/>
+	<copy file="src/${package}/properties/os.properties" filtering="true"
+		  tofile="${build.class}/${package}/os.properties">
+		<filterset>
+		<filter token="DataDir" value="${dataDir}"/>
+	</filterset>
+	</copy>
+	<copy file="src/${package}/properties/daemon.properties"
+			  tofile="${build.class}/com/sun/apoc/daemon.properties"/>
+        
+	<jar jarfile="${build.class}/${jarname}"
+             basedir="${build.class}"
+             includes="${package}/** ${package}/defaults.properties ${package}/os.properties com/sun/apoc/daemon.properties">
+          <manifest>
+            <attribute name="Class-Path" value="@SPIJDK@ @BDBJDK@"/>
+          </manifest>
+        </jar>
+    </target>
+    
+    <target name="main" depends="info, jar"/>  	
+    
+    <target name="clean" depends="info">
+        <delete file="${build.class}/${jarname}"/>
+        <delete dir="${build.class}/${package}"/>
+    </target>
+
+</project>

@@ -1,0 +1,44 @@
+-------------------
+-  Desktop Agent  -
+-------------------
+
+The following steps should be completed in the agent sub directory of the root path of the source code.
+
+Before to continue, make sure you have all the dependencies requeried by this package:
+
+ * The APOC SPI
+ * Berkeley DB (v4.2) library Java bindings
+ * Heimdall Generic Security Service libraries and headers
+ * LibXML2 libraries and headers
+
+ Step 1: Generating the configure script
+-----------------------------------------
+
+NOTE: Tarball releases already include a configure script so this step is unnecessary in that case.
+
+Type this to generate the configure script:
+
+$ ./autogen.sh --help
+
+ Step 2: Calling the configure script
+--------------------------------------
+
+In the root path of the source code, you should execute the configure script. For more information on changing the default paths, execute configure with the --help option. 
+
+$ ./configure --prefix=/usr --with-bdb-path=/path/to/db.jar
+
+NOTE: You should use the same prefix than the SPI. The db.jar would be looked by default on /usr/share/lib/apoc/db.jar, it can be located elsewhere, use the --with-bdb-path option used in the example for any other location.
+
+ Step 3: Building the sources
+------------------------------
+
+If the configuration ends successfully, then you should build and install the sources:
+
+$ make
+$ make install
+
+
+ Post Installation
+-------------------
+
+To start the daemon the build generates an init.d script (initd/apocd) that should be installed manually. An SMF manifest for SOLARIS is generated and installed under the prefix directory as svc/manifest/network/apocd.xml, the SMF database should be updated manually.

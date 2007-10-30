@@ -1,0 +1,75 @@
+<?xml version="1.0"?>
+<!DOCTYPE service_bundle SYSTEM "/usr/share/lib/xml/dtd/service_bundle.dtd.1">
+<!--
+    Copyright 2004 Sun Microsystems, Inc.  All rights reserved.
+    Use is subject to license terms.
+
+    ident	"@(#)x11-server.xml.cpp	1.2	04/11/17 SMI"
+-->
+
+<service_bundle type='manifest' name='SUNWapoc:apocd'>
+
+<service
+	name='network/apocd/udp'
+	type='service'
+	version='1'>
+
+	<dependency
+		type='service'
+		name='fs-local'
+		grouping='require_all'
+		restart_on='none'>
+		<service_fmri value='svc:/system/filesystem/local'/>
+	</dependency>
+
+	<dependency
+		type='service'
+		name='name-services'
+		grouping='require_all'
+		restart_on='refresh'>
+		<service_fmri value='svc:/milestone/name-services'/>
+	</dependency>	
+
+	<exec_method
+        type='method'
+        name='start'
+        exec='@APOCD_DIR@/apocd svcStart'
+        timeout_seconds='30'>
+        <method_context>
+            <method_credential user='root' group='root'/>
+        </method_context>
+    </exec_method>
+
+	<exec_method
+        type='method'
+        name='stop'
+        exec='@APOCD_DIR@/apocd svcStop'
+        timeout_seconds='20'>
+        <method_context>
+            <method_credential user='root' group='root'/>
+        </method_context>
+    </exec_method>
+
+	<exec_method
+		type='method'
+		name='refresh'
+		exec='@APOCD_DIR@/apocd reload'
+		timeout_seconds='5'>
+		<method_context>
+			<method_credential user='root' group='root'/>
+		</method_context>
+	</exec_method>	
+
+	<instance name='default' enabled='false'/>
+
+	<stability value='External'/>
+
+	<template>
+        <common_name>
+            <loctext xml:lang='C'>Configuration Agent</loctext>
+        </common_name>
+    </template>
+
+</service>
+
+</service_bundle>

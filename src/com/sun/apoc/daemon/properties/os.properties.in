@@ -1,0 +1,4 @@
+#
+# The daemon data directory ... where databases, logs etc. are kept
+#
+DataDir=@APOC_DATADIR@

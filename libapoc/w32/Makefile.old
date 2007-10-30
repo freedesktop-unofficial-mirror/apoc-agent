@@ -1,0 +1,110 @@
+#
+#*******************************************************************************
+#* $RCSfile: Makefile,v $
+#*
+#* Description:
+#*
+#* Last change: $Date: 2006/06/27 09:08:56 $ $Revision: 1.9 $
+#*
+#* Copyright 2003 Sun Microsystems, Inc. All rights reserved. Use of this
+#* product is subject to license terms.
+#*
+#*******************************************************************************
+#
+
+
+PRJ=../..
+
+include $(PRJ)/Makefile.common
+
+APOCSOURCES =				\
+	papi.c					\
+	papiConnection.c		\
+	papiDaemon.c			\
+	papiDatabase.c			\
+	papiInternal.c			\
+	papiLayerList.c			\
+	papiListenerList.c		\
+	papiMessage.c			\
+	papiSAXParserContext.c	\
+	papiStringList.c		\
+	papiEntityList.c		\
+	papiUtils.c
+APOCOBJS		= $(APOCSOURCES:%.c=$(OBJDIR)/%.o) $(OBJDIR)/papiPort.o
+LIBAPOC			= $(LIBDIR)/$(SOPREFIX)apoc$(SOSUFFIX)
+APOCINCLUDES	= $(LIBXML2INCLUDES) $(INCLUDES)
+APOCLIBS		= $(LIBXML2LIBS) $(GSSLIBS) $(LIBS)
+ifdef SOLARIS
+APOCLIBS		+= -lscf
+endif
+
+
+APOCJAVASOURCE		= papiJava.c
+APOCJAVAOBJS		= $(APOCJAVASOURCE:%.c=$(OBJDIR)/%.o)
+LIBAPOCJAVA			= $(LIBDIR)/$(SOPREFIX)apoc_java$(SOSUFFIX)
+ifdef UNX
+APOCJAVALIBS		= -L$(LIBDIR) -lapoc $(LIBS)
+else
+APOCJAVALIBS		= apoc.lib $(LIBS)
+endif
+
+
+APOCWRAPSOURCE		= papiWrap.c
+APOCWRAPOBJS		= $(APOCWRAPSOURCE:%.c=$(OBJDIR)/%.o)
+LIBAPOCWRAP			= $(LIBDIR)/$(SOPREFIX)apocwrap$(SOSUFFIX)
+ifdef UNX
+APOCWRAPLIBS		= -L$(LIBDIR) -lapoc $(LIBS) -lrt
+else
+APOCWRAPLIBS		= apoc.lib $(LIBS)
+endif
+
+all:	apoc apoc-adapter-java
+
+clean:	apocclean apoc-adapter-javaclean
+
+apoc:	mkdirs $(LIBAPOC)
+
+$(LIBAPOC):	$(APOCOBJS)
+ifdef UNX
+	$(CC) $(LDFLAGSSO) -o $(LIBAPOC) $(APOCOBJS) $(APOCLIBS) -ldl
+else
+	$(LINK) $(LDFLAGSSO) $(APOCOBJS) /OUT:$(LIBAPOC) $(APOCLIBS)
+endif
+
+apocclean:
+	rm -f $(APOCOBJS) $(LIBAPOC)
+
+apoc-adapter-java:	$(LIBAPOCJAVA)
+
+$(LIBAPOCJAVA):	$(APOCJAVAOBJS)
+ifdef UNX
+	$(CC) $(LDFLAGSSO) -o$(LIBAPOCJAVA) $(APOCJAVAOBJS) $(APOCJAVALIBS)
+else
+	$(LINK) $(LDFLAGSSO) $(APOCJAVAOBJS) /OUT:$(LIBAPOCJAVA) $(APOCJAVALIBS)
+endif
+
+apoc-adapter-javaclean:
+	rm -f $(APOCJAVAOBJS) $(LIBAPOCJAVA)
+
+
+apocwrap:	$(LIBAPOCWRAP)
+
+$(LIBAPOCWRAP):	$(APOCWRAPOBJS)
+ifdef UNX
+	$(CC) $(LDFLAGSSO) -o$(LIBAPOCWRAP) $(APOCWRAPOBJS) $(APOCWRAPLIBS)
+else
+	$(LINK) $(LDFLAGSSO) $(APOCWRAPOBJS) /OUT:$(LIBAPOCWRAP) $(APOCWRAPLIBS)
+endif
+
+apocwrapclean:
+	rm -f $(APOCWRAPOBJS) $(LIBAPOCWRAP)
+
+mkdirs:
+	$(mkoutdirs)
+
+$(OBJDIR)/%.o:	%.c
+ifdef UNX
+	$(CC) $(CFLAGSSO) $(APOCINCLUDES) -c $*.c -o $(OBJDIR)/$*.o
+else
+	$(CC) $(CFLAGSSO) -DPAPI_EXPORTS $(APOCINCLUDES) -c $*.c -Fo$(OBJDIR)/$*.o -Fd$(OBJDIR)/$*.pdb
+endif

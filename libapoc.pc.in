@@ -1,0 +1,13 @@
+prefix=@prefix@
+exec_prefix=@exec_prefix@
+libdir=@libdir@
+includedir=@includedir@
+gssapilibs=@GSSAPI_LIBS@
+gssapiincludes=@GSSAPI_INCLUDES@
+
+Name: libapoc
+Description: library that provides an interface to the APOC desktop agent for applications
+Version: @VERSION@
+Requires: libxml-2.0
+Libs: -L${libdir} -lapoc ${gssapilibs}
+Cflags: -I${includedir}/apoc  ${gssapiincludes}
