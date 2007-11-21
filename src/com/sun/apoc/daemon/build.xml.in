@@ -1,17 +1,4 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!--
-#*************************************************************************
-#*
-#*    $RCSfile: build.xml,v $
-#*
-#*    Creation date     cas  12 February, 2002
-#*    last change       $Author: cm122549 $ $Date: 2006/11/27 15:42:26 $
-#*    $Revision: 1.4 $
-#*
-#*    Copyright 2003, Sun Microsystems, Inc. All Rights Reserved.
-#*
-#*************************************************************************
--->
 <project name="ap_policy" default="main" basedir="../../../../../">
     
     <property name="jarname" value="apocd.jar"/>
@@ -20,12 +7,6 @@
     <property name="build.class" value="build/class"/>
     <property name="build.inc" value="build/inc"/>
 
-	<target name="info">
-	    <echo message="-------------------------------"/>
-	    <echo message="|        APOC Daemon          |"/>
-	    <echo message="-------------------------------"/>
-	</target>
-	
 	<path id="classpath">
 		<pathelement location="@SPIJDK@"/>
 		<pathelement location="@BDBJDK@"/>
@@ -77,9 +58,9 @@
         </jar>
     </target>
     
-    <target name="main" depends="info, jar"/>  	
+    <target name="main" depends="jar"/>  	
     
-    <target name="clean" depends="info">
+    <target name="clean">
         <delete file="${build.class}/${jarname}"/>
         <delete dir="${build.class}/${package}"/>
     </target>
